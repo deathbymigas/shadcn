@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# shadcn — designer-led design-to-code pipeline
 
-## Getting Started
+Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. Figma is the source of truth for tokens and components.
 
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm tokens:build   # generate CSS vars from tokens/tokens.json
+pnpm dev            # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Key commands
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command             | Purpose                                |
+| ------------------- | -------------------------------------- |
+| `pnpm dev`          | Dev server (port 3000)                 |
+| `pnpm build`        | Production build                       |
+| `pnpm typecheck`    | TypeScript check                       |
+| `pnpm lint`         | ESLint                                 |
+| `pnpm test`         | Vitest unit tests                      |
+| `pnpm test:e2e`     | Playwright E2E + visual regression     |
+| `pnpm tokens:build` | Figma tokens → `src/styles/tokens.css` |
+| `pnpm storybook`    | Component review (port 6006)           |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Token pipeline
 
-## Learn More
+`tokens/tokens.json` (from Figma variables) → `scripts/build-tokens.mjs` → `src/styles/tokens.css` (CSS vars) → Tailwind `@theme inline` → components.
 
-To learn more about Next.js, take a look at the following resources:
+Never edit `src/styles/tokens.css` by hand. Edit `tokens/tokens.json`, then run `pnpm tokens:build`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## OpenCode
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Rules: `AGENTS.md` (+ modular rules via `opencode.json` → `instructions`).
+- Reviewer subagent: `.opencode/agents/reviewer.md` (invoke with `@reviewer`).
+- Permissions/formatters: `opencode.json`.
+- Claude Code compat is disabled-friendly: set `OPENCODE_DISABLE_CLAUDE_CODE=1` if you want native-only.
 
-## Deploy on Vercel
+## Environment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Copy `.env.example` to `.env.local` and fill in. Never commit `.env.local`.
