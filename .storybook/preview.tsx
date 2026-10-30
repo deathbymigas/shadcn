@@ -1,7 +1,14 @@
 import type { Preview } from '@storybook/nextjs-vite'
+import '../src/styles/tokens.css'
+import '../src/app/globals.css'
 
 const preview: Preview = {
   parameters: {
+    docs: {
+      source: {
+        state: 'hidden',
+      },
+    },
     controls: {
       matchers: {
        color: /(background|color)$/i,
