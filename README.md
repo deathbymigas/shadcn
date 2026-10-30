@@ -1,4 +1,4 @@
-# shadcn — designer-led design-to-code pipeline
+# designer-led design-to-code pipeline
 
 Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. Figma is the source of truth for tokens and components.
 
