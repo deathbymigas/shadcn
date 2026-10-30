@@ -41,7 +41,7 @@ Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. Designer-led: Figm
 
 ## Smells to avoid in this file
 
-Keep ≤ 200 lines. Move rare procedures to `.opencode/skills/`. Move style rules to Biome/eslint. Pitch every external reference with why/when to read.
+Keep ≤ 200 lines. Move rare procedures into focused `docs/` guides and link them where relevant. Move style rules to lint tooling. Explain when external references are useful.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

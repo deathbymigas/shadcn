@@ -32,12 +32,9 @@ Never edit `src/styles/tokens.css` by hand. Edit `tokens/tokens.json`, then run 
 
 Storybook loads the generated token CSS and Tailwind v4 utilities through its Vite configuration. Run `pnpm build-storybook` to verify the production Storybook bundle.
 
-## OpenCode
+## Agent guidance
 
-- Rules: `AGENTS.md` (+ modular rules via `opencode.json` → `instructions`).
-- Reviewer subagent: `.opencode/agents/reviewer.md` (invoke with `@reviewer`).
-- Permissions/formatters: `opencode.json`.
-- Claude Code compat is disabled-friendly: set `OPENCODE_DISABLE_CLAUDE_CODE=1` if you want native-only.
+Shared project instructions live in `AGENTS.md`. Tool-specific configuration should load those instructions instead of maintaining a separate copy.
 
 ## Environment
 
