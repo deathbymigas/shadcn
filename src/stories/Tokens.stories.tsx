@@ -25,14 +25,33 @@ export const Palette: Story = {
       className="bg-background text-foreground"
       style={{ backgroundColor: "var(--background, Canvas)", color: "var(--foreground, CanvasText)" }}
     >
-      <div className="grid grid-cols-4 gap-4 p-4">
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+          gap: "calc(var(--spacing, 0.25rem) * 4)",
+          padding: "calc(var(--spacing, 0.25rem) * 4)",
+        }}
+      >
         {tokens.map((t) => (
-          <div key={t} className="space-y-1">
+          <div key={t} style={{ display: "grid", gap: "calc(var(--spacing, 0.25rem) * 1)" }}>
             <div
-              className="h-16 rounded-md border border-border"
-              style={{ backgroundColor: `var(--${t})` }}
+              style={{
+                height: "calc(var(--spacing, 0.25rem) * 16)",
+                borderRadius: "var(--radius-md, 0.375rem)",
+                border: "1px solid var(--border, CanvasText)",
+                backgroundColor: `var(--${t}, Canvas)`,
+              }}
             />
-            <p className="text-xs font-mono text-muted-foreground">--{t}</p>
+            <p
+              style={{
+                color: "var(--muted-foreground, CanvasText)",
+                fontSize: "0.75rem",
+                fontFamily: "var(--font-family-mono, monospace)",
+              }}
+            >
+              --{t}
+            </p>
           </div>
         ))}
       </div>
@@ -52,14 +71,33 @@ export const DarkPalette: Story = {
     ),
   ],
   render: () => (
-    <div className="grid grid-cols-4 gap-4 p-4">
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+        gap: "calc(var(--spacing, 0.25rem) * 4)",
+        padding: "calc(var(--spacing, 0.25rem) * 4)",
+      }}
+    >
       {tokens.map((t) => (
-        <div key={t} className="space-y-1">
+        <div key={t} style={{ display: "grid", gap: "calc(var(--spacing, 0.25rem) * 1)" }}>
           <div
-            className="h-16 rounded-md border border-border"
-            style={{ backgroundColor: `var(--${t})` }}
+            style={{
+              height: "calc(var(--spacing, 0.25rem) * 16)",
+              borderRadius: "var(--radius-md, 0.375rem)",
+              border: "1px solid var(--border, CanvasText)",
+              backgroundColor: `var(--${t}, Canvas)`,
+            }}
           />
-          <p className="text-xs font-mono text-muted-foreground">--{t}</p>
+          <p
+            style={{
+              color: "var(--muted-foreground, CanvasText)",
+              fontSize: "0.75rem",
+              fontFamily: "var(--font-family-mono, monospace)",
+            }}
+          >
+            --{t}
+          </p>
         </div>
       ))}
     </div>
