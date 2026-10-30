@@ -19,6 +19,7 @@ Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. Designer-led: Figm
 - Use components from `src/components/ui` only. Never create ad-hoc styled divs.
 - Tokens live in `tokens/tokens.json` (source of truth from Figma). Generated CSS vars land in `src/styles/tokens.css`. Never hardcode colors/spacing/radii.
 - Follow Figma Code Connect mappings in `src/components/ui/*.figma.tsx`. If a component is missing, stop and ask.
+- Font family changes require updating `next/font` in `src/app/layout.tsx` to match `tokens.json` → `typography.fontFamily`, then `pnpm tokens:build`.
 - Dark mode via `.dark` class; both themes must be verified.
 
 ## Guardrails

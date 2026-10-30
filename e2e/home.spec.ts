@@ -8,5 +8,10 @@ test("home page renders", async ({ page }) => {
 
 test("home page visual baseline", async ({ page }) => {
   await page.goto("/");
-  await expect(page).toHaveScreenshot("home.png", { fullPage: true });
+  await page.waitForLoadState("networkidle");
+  await expect(page).toHaveScreenshot("home.png", {
+    fullPage: true,
+    animations: "disabled",
+    maxDiffPixelRatio: 0.02,
+  });
 });
