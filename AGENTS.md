@@ -13,6 +13,7 @@ Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. Designer-led: Figm
 - E2E/visual: `pnpm test:e2e` (playwright)
 - Tokens: `pnpm tokens:build` (Figma tokens → CSS vars)
 - Storybook: `pnpm storybook`
+- Storybook build: `pnpm build-storybook`
 
 ## Design system
 
@@ -21,6 +22,7 @@ Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. Designer-led: Figm
 - Follow Figma Code Connect mappings in `src/components/ui/*.figma.tsx`. If a component is missing, stop and ask.
 - Font family changes require updating `next/font` in `src/app/layout.tsx` to match `tokens.json` → `typography.fontFamily`, then `pnpm tokens:build`.
 - Dark mode via `.dark` class; both themes must be verified.
+- Storybook loads `src/styles/tokens.css` and compiles Tailwind utilities through `@tailwindcss/vite` in `.storybook/main.ts`. Import both token and global CSS in `.storybook/preview.tsx`; verify rendered light and dark stories, not just a successful build.
 
 ## Guardrails
 
