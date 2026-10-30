@@ -2,6 +2,8 @@
 
 Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. Figma is the source of truth for tokens and components.
 
+This project is designed to work with this Figma file template: https://www.figma.com/community/file/1342715840824755935/shadcn-ui-components-with-variables-tailwind-classes-updated-october-2026
+
 ## Getting started
 
 ```bash
