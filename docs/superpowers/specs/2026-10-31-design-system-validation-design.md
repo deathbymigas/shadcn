@@ -1,6 +1,6 @@
 # Design System Validation
 
-**Status:** Approved design
+**Status:** Revised design — pending review
 
 **Date:** 2026-10-31
 
@@ -8,6 +8,10 @@
 
 Make design-system validation a repeatable local and CI operation that reports
 the result of each required check and fails clearly when any check fails.
+Swamp type and extension searches found no existing design-system validator.
+Because this repository only needs local commands and PR/push checks, a custom
+Swamp layer would add setup and maintenance without a required Swamp-specific
+capability.
 
 ## Scope
 
@@ -20,26 +24,16 @@ The validation covers:
 5. Storybook accessibility tests
 6. Playwright visual and end-to-end tests with `pnpm test:e2e`
 
-The target project is `deathbymigas/shadcn`. Swamp's initialized workspace is
-the nested `shadcn/` directory, so the project directory must be an explicit
-behavior input rather than an implicit current-working-directory assumption.
+The target project is `deathbymigas/shadcn`.
 
 ## Design
 
-Use a local Swamp behavior extension at `shadcn/extensions/models/` as the
-single source of validation logic, registered as
-`@jessebasham/design-system-validation`. Its `validate` method accepts the
-target project directory and runs the six checks in sequence. It invokes
-commands with argument arrays rather than shell interpolation, records a
-structured result for each check, and continues after a failed check so one
-run reports all failures. The overall validation fails when any check exits
-unsuccessfully.
-
-The behavior writes an output resource containing the target, check names,
-commands, exit statuses, and captured diagnostics. It must not turn a failed
-check into a success-shaped result. The target directory is required at run
-time to prevent accidentally validating the Swamp workspace instead of the
-project.
+Add a project script, `pnpm validate:design-system`, as the single source of
+validation logic. A small Node.js runner invokes the six existing or dedicated
+check commands with argument arrays, records a clear pass/fail summary for
+each, and continues after failures so one run reports all results. The overall
+script exits unsuccessfully if any check fails. It runs from the project root
+and does not rely on Swamp's separate nested workspace.
 
 ### Accessibility
 
@@ -52,22 +46,23 @@ adding an npm dependency.
 
 ### Local and CI use
 
-Developers run the Swamp behavior from the initialized nested workspace and
-pass the parent project directory explicitly (for example, `..`). GitHub
-Actions invokes the same behavior on pull requests and pushes, preserving CI
-status reporting. CI also installs the Chromium browser required by the
-Storybook and Playwright checks, and uploads the validation artifacts.
+Developers run `pnpm validate:design-system` from the project root. GitHub
+Actions runs the same command on pull requests and pushes, preserving native CI
+status reporting. CI installs the Chromium browser required by the Storybook
+and Playwright checks and uploads the token CSS, contract manifest, and
+Playwright report artifacts.
 
-Update the root README with the local Swamp invocation and the new a11y test
-command. Leave the existing incomplete root `.swamp/` files untouched; they
-are outside the initialized Swamp workspace.
+Update the root README with the aggregate validation command and the dedicated
+a11y test command. Leave the separate nested Swamp workspace and the existing
+incomplete root `.swamp/` files untouched; they are outside this validation
+implementation.
 
 ## Failure handling
 
 - Each check records its exit code and diagnostics.
 - A failed check does not prevent later checks from running.
-- The final behavior result and CI job fail if one or more checks fail.
-- Failures to start a command or access the explicitly named project are
+- The final script result and CI job fail if one or more checks fail.
+- Failures to start a command or access the project root are
   reported as errors, not treated as passing checks.
 - Token generation uses the existing command and may update the generated
   `src/styles/tokens.css`; generated files remain generated and are not edited
@@ -75,10 +70,10 @@ are outside the initialized Swamp workspace.
 
 ## Validation of this design
 
-Implementation should verify behavior registration and definition validation,
-the Storybook a11y test configuration, all six commands, and a complete
-behavior run against the confirmed project. Unit tests should cover command
-result aggregation and the requirement to continue after individual failures.
+Implementation should verify the Storybook a11y test configuration, the
+runner's command list and failure aggregation, all six checks, and the complete
+aggregate command. Unit tests should confirm that all checks run after an
+individual failure and that the final exit code reflects every result.
 
 ## Compatibility with prior scope
 
@@ -86,3 +81,11 @@ The token-pipeline design dated 2026-10-30 listed CI setup and visual regression
 as out of scope for that token-pipeline work. This design adds CI and visual/E2E
 validation for the broader design-system validation task; it does not change
 the token pipeline's source or format decisions.
+
+## Swamp decision
+
+Swamp can provide typed inputs, queryable run history, data chaining, and
+cross-project reuse. Those capabilities are not required for this repository's
+local checks and CI gate, so no custom Swamp extension or Swamp Action is part
+of this design. Swamp may be reconsidered if validation results need to feed
+other behaviors or be queried across runs/projects.
