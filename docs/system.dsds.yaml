@@ -1,0 +1,12 @@
+schemaVersion: "0.23.1"
+name: "shadcn/ui Design System"
+entries:
+  - kind: system
+    id: shadcn-ui
+    name: "shadcn/ui"
+    description: "The component library for this project."
+    metadata:
+      status: { status: stable }
+      organization: "shadcn"
+      version: "0.1.0"
+      platforms: [react]

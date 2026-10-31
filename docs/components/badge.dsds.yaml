@@ -1,0 +1,52 @@
+schemaVersion: "0.23.1"
+name: "Badge Component"
+entries:
+  - kind: component
+    id: badge
+    name: Badge
+    description: "A small label for status, category, or count."
+    sourceFiles:
+      - platform: react
+        file: ../../src/components/ui/badge.tsx
+    specs:
+      - ../../contracts/badge.contract.json
+    traits:
+      - id: variant
+        kind: enum
+        description: "Visual style variant"
+        values:
+          - id: default
+            description: "Default badge style"
+          - id: secondary
+            description: "Secondary badge style"
+          - id: destructive
+            description: "Destructive badge style"
+          - id: outline
+            description: "Outlined badge style"
+          - id: ghost
+            description: "Ghost badge style"
+          - id: link
+            description: "Link badge style"
+        traitType: variant
+    uses:
+      - to: color
+      - to: radius
+    refs:
+      - href: https://ui.shadcn.com/docs/components/badge
+        rel: source
+      - href: https://storybook.example.com/?path=/story/components-badge--default
+        rel: demo
+    sections:
+      - kind: guidelines
+        for: all
+        framing: when-to-use
+        items:
+          - level: should
+            statement: Use for status indicators, not for primary actions.
+            checkedBy: manual
+      - kind: guidelines
+        for: agent
+        items:
+          - level: must-not
+            statement: Do not create custom badge components; use the Badge component from src/components/ui.
+            checkedBy: assisted

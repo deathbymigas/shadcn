@@ -1,0 +1,32 @@
+schemaVersion: "0.23.1"
+name: "Color Tokens"
+entries:
+  - kind: token
+    id: color
+    name: Color
+    description: "Color tokens for light and dark themes."
+    tokenType: color
+    source: ../../tokens/tokens.json
+    sections:
+      - kind: guidelines
+        for: all
+        framing: when-to-use
+        items:
+          - level: must
+            statement: Use semantic color tokens (e.g., color.primary) not palette tokens (e.g., color.blue.500) in components.
+            checkedBy: assisted
+          - level: should
+            statement: Prefer color.foreground/background for text on surfaces.
+            checkedBy: manual
+          - level: must
+            statement: All color tokens must define both light and dark values.
+            checkedBy: automated
+            checks:
+              - ../../tokens/tokens.json
+      - kind: definitions
+        for: all
+        items:
+          - term: "semantic color"
+            definition: "A color token named for its purpose (e.g., primary, destructive) rather than its hue."
+          - term: "palette color"
+            definition: "A color token named for its hue and scale position (e.g., blue.500)."

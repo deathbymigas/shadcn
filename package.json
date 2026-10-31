@@ -49,6 +49,7 @@
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "canonical-json": "^0.0.4",
+    "design-system-documentation-schema": "github:somerandomdude/design-system-documentation-schema",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
     "eslint-plugin-storybook": "^10.6.5",

@@ -1,0 +1,18 @@
+schemaVersion: "0.23.1"
+name: "Radius Tokens"
+entries:
+  - kind: token
+    id: radius
+    name: Border Radius
+    description: "Border radius tokens."
+    tokenType: dimension
+    source: ../../tokens/tokens.json
+    sections:
+      - kind: guidelines
+        for: all
+        items:
+          - level: must
+            statement: Use token radius variables (--radius, --radius-sm, etc.) not raw values.
+            checkedBy: automated
+            checks:
+              - ../../tokens/tokens.json

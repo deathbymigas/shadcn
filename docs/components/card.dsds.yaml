@@ -1,0 +1,54 @@
+schemaVersion: "0.23.1"
+name: "Card Component"
+entries:
+  - kind: component
+    id: card
+    name: Card
+    description: "A container for grouping related content with optional header, content, and footer."
+    sourceFiles:
+      - platform: react
+        file: ../../src/components/ui/card.tsx
+    specs:
+      - ../../contracts/card.contract.json
+    traits:
+      - id: size
+        kind: enum
+        description: "Card size variant"
+        values:
+          - id: default
+            description: "Default card size"
+          - id: sm
+            description: "Small card size"
+        traitType: variant
+    uses:
+      - to: color
+      - to: radius
+    combos:
+      - subject: size.default
+        level: should
+        items: [color]
+      - subject: size.sm
+        level: should
+        items: [color]
+    refs:
+      - href: https://ui.shadcn.com/docs/components/card
+        rel: source
+      - href: https://storybook.example.com/?path=/story/components-card--default
+        rel: demo
+    sections:
+      - kind: guidelines
+        for: all
+        framing: when-to-use
+        items:
+          - level: should
+            statement: Use Card for grouped content sections; avoid using as a generic wrapper.
+            checkedBy: manual
+      - kind: guidelines
+        for: agent
+        items:
+          - level: must-not
+            statement: Do not create custom card components; use the Card component and its sub-components from src/components/ui.
+            checkedBy: assisted
+          - level: should
+            statement: Compose Card with CardHeader, CardTitle, CardDescription, CardContent, CardFooter as needed.
+            checkedBy: assisted

@@ -1,0 +1,7 @@
+schemaVersion: "0.23.1"
+name: "Light/Dark Theme"
+entries:
+  - kind: theme
+    id: light-dark
+    name: Light / Dark
+    description: "System supports light and dark modes via .dark class."

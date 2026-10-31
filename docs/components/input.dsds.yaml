@@ -1,0 +1,64 @@
+schemaVersion: "0.23.1"
+name: "Input Component"
+entries:
+  - kind: component
+    id: input
+    name: Input
+    description: "A text input field for user entry."
+    sourceFiles:
+      - platform: react
+        file: ../../src/components/ui/input.tsx
+    specs:
+      - ../../contracts/input.contract.json
+    traits:
+      - id: type
+        kind: enum
+        description: "Input type"
+        values:
+          - id: text
+            description: "Plain text input"
+          - id: password
+            description: "Password input"
+          - id: email
+            description: "Email input"
+          - id: number
+            description: "Number input"
+          - id: tel
+            description: "Telephone input"
+          - id: url
+            description: "URL input"
+          - id: search
+            description: "Search input"
+        traitType: variant
+      - id: disabled
+        kind: boolean
+        description: "Whether the input is disabled"
+        traitType: state
+    uses:
+      - to: color
+      - to: radius
+    refs:
+      - href: https://ui.shadcn.com/docs/components/input
+        rel: source
+      - href: https://storybook.example.com/?path=/story/components-input--default
+        rel: demo
+    sections:
+      - kind: guidelines
+        for: all
+        framing: when-to-use
+        items:
+          - level: must
+            statement: Associate every input with a Label component using htmlFor.
+            checkedBy: assisted
+          - level: should
+            statement: Use appropriate type (email, password, etc.) for browser validation and UX.
+            checkedBy: manual
+      - kind: guidelines
+        for: agent
+        items:
+          - level: must
+            statement: Always wrap Input with Label for accessibility; do not use placeholder as label.
+            checkedBy: assisted
+          - level: must-not
+            statement: Do not create custom input components; use the Input component from src/components/ui.
+            checkedBy: assisted

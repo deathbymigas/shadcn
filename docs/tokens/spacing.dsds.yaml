@@ -1,0 +1,21 @@
+schemaVersion: "0.23.1"
+name: "Spacing Tokens"
+entries:
+  - kind: token
+    id: spacing
+    name: Spacing
+    description: "Spacing scale tokens."
+    tokenType: dimension
+    source: ../../tokens/tokens.json
+    sections:
+      - kind: guidelines
+        for: all
+        items:
+          - level: must
+            statement: Use token spacing variables (--token-spacing-*) not raw values.
+            checkedBy: automated
+            checks:
+              - ../../tokens/tokens.json
+          - level: should
+            statement: Use the spacing scale consistently; avoid arbitrary pixel values.
+            checkedBy: manual

@@ -1,0 +1,33 @@
+schemaVersion: "0.23.1"
+name: "Label Component"
+entries:
+  - kind: component
+    id: label
+    name: Label
+    description: "A label for a form control."
+    sourceFiles:
+      - platform: react
+        file: ../../src/components/ui/label.tsx
+    specs:
+      - ../../contracts/label.contract.json
+    uses:
+      - to: color
+    refs:
+      - href: https://ui.shadcn.com/docs/components/label
+        rel: source
+      - href: https://storybook.example.com/?path=/story/components-label--default
+        rel: demo
+    sections:
+      - kind: guidelines
+        for: all
+        framing: when-to-use
+        items:
+          - level: must
+            statement: Every form control must have an associated Label.
+            checkedBy: assisted
+      - kind: guidelines
+        for: agent
+        items:
+          - level: must
+            statement: Use htmlFor to associate Label with its input; do not wrap input inside Label.
+            checkedBy: assisted

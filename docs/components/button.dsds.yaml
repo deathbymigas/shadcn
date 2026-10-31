@@ -1,0 +1,103 @@
+schemaVersion: "0.23.1"
+name: "Button Component"
+entries:
+  - kind: component
+    id: button
+    name: Button
+    description: "Triggers an action or event when activated."
+    sourceFiles:
+      - platform: react
+        file: ../../src/components/ui/button.tsx
+    specs:
+      - ../../contracts/button.contract.json
+    traits:
+      - id: variant
+        kind: enum
+        description: "Visual style variant"
+        values:
+          - id: default
+            description: "Primary button style"
+          - id: destructive
+            description: "Destructive action style"
+          - id: outline
+            description: "Outlined button style"
+          - id: secondary
+            description: "Secondary button style"
+          - id: ghost
+            description: "Ghost button style"
+          - id: link
+            description: "Link button style"
+        traitType: variant
+      - id: size
+        kind: enum
+        description: "Button size"
+        values:
+          - id: default
+            description: "Default size"
+          - id: xs
+            description: "Extra small"
+          - id: sm
+            description: "Small"
+          - id: lg
+            description: "Large"
+          - id: icon
+            description: "Icon-only size"
+          - id: icon-xs
+            description: "Extra small icon"
+          - id: icon-sm
+            description: "Small icon"
+          - id: icon-lg
+            description: "Large icon"
+        traitType: variant
+      - id: disabled
+        kind: boolean
+        description: "Whether the button is disabled"
+        traitType: state
+      - id: asChild
+        kind: boolean
+        description: "Render as child component (Radix Slot)"
+        traitType: variant
+    uses:
+      - to: color
+      - to: radius
+    combos:
+      - subject: variant.default
+        level: should
+        items: [size.default]
+      - subject: variant.destructive
+        level: should
+        items: [size.default]
+      - subject: variant.secondary
+        level: should
+        items: [size.default]
+      - subject: variant.ghost
+        level: should
+        items: [size.default]
+    refs:
+      - href: https://ui.shadcn.com/docs/components/button
+        rel: source
+      - href: https://storybook.example.com/?path=/story/components-button--default
+        rel: demo
+    sections:
+      - kind: guidelines
+        for: all
+        framing: when-to-use
+        items:
+          - level: must
+            statement: Use <button> for actions, <a> for navigation.
+            checkedBy: assisted
+          - level: should
+            statement: One primary button per screen.
+            checkedBy: manual
+      - kind: guidelines
+        for: agent
+        items:
+          - level: must-not
+            statement: Do not create custom button components; use the Button component from src/components/ui.
+            checkedBy: assisted
+          - level: must
+            statement: Always pass accessible label via children or aria-label when using asChild with icon-only content.
+            checkedBy: assisted
+          - level: should
+            statement: Use the variant enum values exactly as defined in the contract; do not invent new variants.
+            checkedBy: assisted
