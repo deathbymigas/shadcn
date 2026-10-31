@@ -46,9 +46,9 @@ entries:
       - kind: guidelines
         for: agent
         items:
-          - level: must-not
-            statement: Do not create custom card components; use the Card component and its sub-components from src/components/ui.
-            checkedBy: assisted
           - level: should
             statement: Compose Card with CardHeader, CardTitle, CardDescription, CardContent, CardFooter as needed.
+            checkedBy: assisted
+          - level: must-not
+            statement: Do not create custom card components; use the Card component and its sub-components from src/components/ui.
             checkedBy: assisted

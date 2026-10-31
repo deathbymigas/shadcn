@@ -20,6 +20,20 @@ contracts/*.contract.json ──┘       │
 
 ---
 
+## Implementation Status
+
+| Task                                 | Status              | Notes                                                                                                              |
+| ------------------------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 1. Contract foundation               | Complete            | Local schemas, manifest generator, TypeScript drift validation, and contract tests are present.                    |
+| 2. Pilot contracts                   | Complete            | Core component contracts and matching TypeScript APIs are covered.                                                 |
+| 3. Full contract coverage            | Complete            | Contracts cover the current documented UI components.                                                              |
+| 4. DSDS layer                        | Complete            | System, token, component, and theme manifests are linted.                                                          |
+| 5. Agent integration and CI          | Complete            | Repository guidance and CI validation are in place.                                                                |
+| 6. Figma Code Connect interop        | Deferred (optional) | No Code Connect mappings or contract adapter are present; the optional hybrid path was not required for adoption.  |
+| 7. Full validation and documentation | Complete            | Validation, Storybook review, fresh-conversation smoke test, and workflow/troubleshooting docs are recorded below. |
+
+---
+
 ## Files and Responsibilities
 
 | File/Directory                   | Responsibility                                                                                         |
@@ -833,6 +847,21 @@ In a fresh conversation, ask an agent to:
 git add .github/workflows/lint.yml AGENTS.md README.md
 git commit -m "docs: add Contract + DSDS workflow to CI and agent instructions"
 ```
+
+### Completion record (2026-10-31)
+
+| Validation                            | Result | Evidence                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm test`                           | Pass   | 4 test files, 40 tests passed.                                                                                                                                                                                                                                                                                                                                                                       |
+| `pnpm typecheck`                      | Pass   | `tsc --noEmit` completed successfully.                                                                                                                                                                                                                                                                                                                                                               |
+| `pnpm lint`                           | Pass   | ESLint completed successfully.                                                                                                                                                                                                                                                                                                                                                                       |
+| `node scripts/validate-contracts.mjs` | Pass   | All contracts match TypeScript.                                                                                                                                                                                                                                                                                                                                                                      |
+| `node scripts/dsds-lint.mjs`          | Pass   | 10 files linted, 0 warnings after fixing guideline order.                                                                                                                                                                                                                                                                                                                                            |
+| `pnpm build-storybook`                | Pass   | Production Storybook build completed; Vite reported a chunk larger than 500 kB.                                                                                                                                                                                                                                                                                                                      |
+| Storybook visual review               | Pass   | Light/dark color stories resolved generated variables; spacing token 1 rendered at 4 px and radius at 10 px. Button stories now expose all six contract variants, including rendered Ghost and Link stories.                                                                                                                                                                                         |
+| Fresh-conversation agent smoke test   | Pass   | In an isolated worktree, the agent temporarily added `success` to the Button contract and TypeScript variant, regenerated the manifest, validated contract parity, documented the DSDS trait/combo, and passed DSDS lint. All temporary edits were restored; no commit was made. The smoke-test branch reported three advisory DSDS-19 ordering warnings before the ordering fixes in this worktree. |
+
+Vitest also emitted a Vite `configLoader: 'native'` compatibility warning; it did not affect the test result.
 
 ---
 

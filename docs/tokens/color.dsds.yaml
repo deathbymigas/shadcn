@@ -15,14 +15,14 @@ entries:
           - level: must
             statement: Use semantic color tokens (e.g., color.primary) not palette tokens (e.g., color.blue.500) in components.
             checkedBy: assisted
-          - level: should
-            statement: Prefer color.foreground/background for text on surfaces.
-            checkedBy: manual
           - level: must
             statement: All color tokens must define both light and dark values.
             checkedBy: automated
             checks:
               - ../../tokens/tokens.json
+          - level: should
+            statement: Prefer color.foreground/background for text on surfaces.
+            checkedBy: manual
       - kind: definitions
         for: all
         items:

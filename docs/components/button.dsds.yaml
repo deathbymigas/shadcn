@@ -92,12 +92,12 @@ entries:
       - kind: guidelines
         for: agent
         items:
-          - level: must-not
-            statement: Do not create custom button components; use the Button component from src/components/ui.
-            checkedBy: assisted
           - level: must
             statement: Always pass accessible label via children or aria-label when using asChild with icon-only content.
             checkedBy: assisted
           - level: should
             statement: Use the variant enum values exactly as defined in the contract; do not invent new variants.
+            checkedBy: assisted
+          - level: must-not
+            statement: Do not create custom button components; use the Button component from src/components/ui.
             checkedBy: assisted
