@@ -1,0 +1,70 @@
+{
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "contractId": "button",
+  "component": "Button",
+  "description": "A button triggers an action or event when activated.",
+  "props": {
+    "properties": {
+      "variant": {
+        "type": "string",
+        "enum": [
+          "default",
+          "destructive",
+          "outline",
+          "secondary",
+          "ghost",
+          "link"
+        ],
+        "default": "default",
+        "description": "Visual style variant"
+      },
+      "size": {
+        "type": "string",
+        "enum": [
+          "default",
+          "xs",
+          "sm",
+          "lg",
+          "icon",
+          "icon-xs",
+          "icon-sm",
+          "icon-lg"
+        ],
+        "default": "default",
+        "description": "Button size"
+      },
+      "asChild": {
+        "type": "boolean",
+        "default": false,
+        "description": "Render as child component (Radix Slot)"
+      },
+      "disabled": {
+        "type": "boolean",
+        "default": false,
+        "description": "Whether the button is disabled"
+      },
+      "type": {
+        "type": "string",
+        "enum": ["button", "submit", "reset"],
+        "default": "button"
+      },
+      "className": {
+        "type": "string",
+        "description": "Additional CSS classes"
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "slots": [
+    {
+      "name": "default",
+      "a11y": {
+        "nameFrom": "content",
+        "required": true
+      }
+    }
+  ],
+  "states": ["hover", "focus", "active", "disabled"],
+  "shadcnRef": "button"
+}

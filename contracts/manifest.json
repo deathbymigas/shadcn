@@ -1,0 +1,31 @@
+{
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+  "contractVersion": "0.1.0",
+  "artifacts": [
+    {
+      "path": "badge.contract.json",
+      "address": "sha256:a614fa8ab12fe89d0e95c2540e007c5b6ff3fb473803eb63e1195f579c43bc17",
+      "origin": "synced"
+    },
+    {
+      "path": "button.contract.json",
+      "address": "sha256:559607b034351316eea5af7220c321a665d752dcb005af49439def7b929d09ca",
+      "origin": "synced"
+    },
+    {
+      "path": "card.contract.json",
+      "address": "sha256:1a4453605d6a13e42523f9d314c9c7719c462f5aa23be18439e0695cde0a4000",
+      "origin": "synced"
+    },
+    {
+      "path": "input.contract.json",
+      "address": "sha256:ee457fedc867df0c91d4166df4af2930a7fbc5450796e602efc76bd95d873ba1",
+      "origin": "synced"
+    },
+    {
+      "path": "label.contract.json",
+      "address": "sha256:b7669406c464fb0899ef331b00c8ff5d98da4b201a21127bb15a64f466a38c3a",
+      "origin": "synced"
+    }
+  ]
+}

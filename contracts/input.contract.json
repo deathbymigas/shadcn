@@ -1,0 +1,46 @@
+{
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "contractId": "input",
+  "component": "Input",
+  "description": "An input field for text entry.",
+  "props": {
+    "properties": {
+      "type": {
+        "type": "string",
+        "enum": ["text", "password", "email", "number", "tel", "url", "search"],
+        "default": "text",
+        "description": "Input type"
+      },
+      "disabled": {
+        "type": "boolean",
+        "default": false,
+        "description": "Whether the input is disabled"
+      },
+      "placeholder": {
+        "type": "string",
+        "description": "Placeholder text"
+      },
+      "value": {
+        "type": "string",
+        "description": "Controlled value"
+      },
+      "defaultValue": {
+        "type": "string",
+        "description": "Uncontrolled default value"
+      },
+      "onChange": {
+        "type": "string",
+        "description": "Change event handler"
+      },
+      "className": {
+        "type": "string",
+        "description": "Additional CSS classes"
+      }
+    },
+    "required": ["type"],
+    "additionalProperties": false
+  },
+  "slots": [],
+  "states": ["hover", "focus", "disabled", "invalid"],
+  "shadcnRef": "input"
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "contractId": "badge",
+  "component": "Badge",
+  "description": "A small label for status, category, or count.",
+  "props": {
+    "properties": {
+      "variant": {
+        "type": "string",
+        "enum": [
+          "default",
+          "secondary",
+          "destructive",
+          "outline",
+          "ghost",
+          "link"
+        ],
+        "default": "default",
+        "description": "Visual style variant"
+      },
+      "render": {
+        "type": "string",
+        "description": "Custom render element (e.g., 'a' for link)"
+      },
+      "className": {
+        "type": "string",
+        "description": "Additional CSS classes"
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "slots": [
+    {
+      "name": "default",
+      "a11y": {
+        "nameFrom": "content",
+        "required": true
+      }
+    }
+  ],
+  "states": ["hover", "focus", "disabled"],
+  "shadcnRef": "badge"
+}

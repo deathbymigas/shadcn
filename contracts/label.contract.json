@@ -1,0 +1,31 @@
+{
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "contractId": "label",
+  "component": "Label",
+  "description": "A label for a form control.",
+  "props": {
+    "properties": {
+      "htmlFor": {
+        "type": "string",
+        "description": "ID of the form control this label is for"
+      },
+      "className": {
+        "type": "string",
+        "description": "Additional CSS classes"
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "slots": [
+    {
+      "name": "default",
+      "a11y": {
+        "nameFrom": "content",
+        "required": true
+      }
+    }
+  ],
+  "states": ["disabled"],
+  "shadcnRef": "label"
+}

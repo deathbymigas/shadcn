@@ -1,0 +1,58 @@
+{
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "contractId": "card",
+  "component": "Card",
+  "description": "A container for grouping related content with optional header, content, and footer.",
+  "props": {
+    "properties": {
+      "size": {
+        "type": "string",
+        "enum": ["default", "sm"],
+        "default": "default",
+        "description": "Card size variant"
+      },
+      "className": {
+        "type": "string",
+        "description": "Additional CSS classes"
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "slots": [
+    {
+      "name": "default",
+      "description": "Main card content",
+      "a11y": {
+        "nameFrom": "author",
+        "required": false
+      }
+    },
+    {
+      "name": "card-header",
+      "description": "Card header section"
+    },
+    {
+      "name": "card-title",
+      "description": "Card title"
+    },
+    {
+      "name": "card-description",
+      "description": "Card description"
+    },
+    {
+      "name": "card-content",
+      "description": "Card main content"
+    },
+    {
+      "name": "card-footer",
+      "description": "Card footer section"
+    },
+    {
+      "name": "card-action",
+      "description": "Card action area (e.g., button)"
+    }
+  ],
+  "states": ["hover", "focus"],
+  "shadcnRef": "card"
+}
