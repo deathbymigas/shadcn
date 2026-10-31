@@ -286,6 +286,7 @@ describe("current component contract inventory", () => {
       .map((artifact) => artifact.path)
       .sort();
 
+    expect(Object.keys(contractCoverage).sort()).toEqual(componentNames);
     expect(contractNames).toEqual(componentNames);
     expect(artifactPaths).toEqual(
       componentNames.map((name) => `${name}.contract.json`),
