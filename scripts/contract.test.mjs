@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { readFileSync, writeFileSync, rmSync, mkdtempSync } from "node:fs";
+import {
+  readFileSync,
+  writeFileSync,
+  rmSync,
+  mkdtempSync,
+  readdirSync,
+} from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
@@ -217,4 +223,113 @@ describe("manifest generator", () => {
     const manifest = await generateManifest(tempContractsDir);
     expect(validateManifest(manifest)).toBe(true);
   });
+});
+
+const contractCoverage = {
+  badge: {
+    enums: {
+      variant: ["default", "secondary", "destructive", "outline", "ghost", "link"],
+    },
+    slots: ["default"],
+    states: ["hover", "focus", "disabled"],
+  },
+  button: {
+    enums: {
+      variant: ["default", "destructive", "outline", "secondary", "ghost", "link"],
+      size: ["default", "xs", "sm", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"],
+    },
+    slots: ["default"],
+    states: ["hover", "focus", "active", "disabled"],
+  },
+  card: {
+    enums: { size: ["default", "sm"] },
+    slots: [
+      "default",
+      "card-header",
+      "card-title",
+      "card-description",
+      "card-content",
+      "card-footer",
+      "card-action",
+    ],
+    states: ["hover", "focus"],
+  },
+  input: {
+    enums: {
+      type: ["text", "password", "email", "number", "tel", "url", "search"],
+    },
+    slots: [],
+    states: ["hover", "focus", "disabled", "invalid"],
+  },
+  label: {
+    enums: {},
+    slots: ["default"],
+    states: ["disabled"],
+  },
+};
+
+describe("current component contract inventory", () => {
+  it("matches source components with contract files and manifest artifacts", () => {
+    const componentNames = readdirSync(join(root, "src/components/ui"))
+      .filter((file) => file.endsWith(".tsx") && !file.endsWith(".test.tsx"))
+      .map((file) => file.replace(/\.tsx$/, ""))
+      .sort();
+    const contractNames = readdirSync(join(root, "contracts"))
+      .filter((file) => file.endsWith(".contract.json"))
+      .map((file) => file.replace(/\.contract\.json$/, ""))
+      .sort();
+    const manifest = JSON.parse(
+      readFileSync(join(root, "contracts/manifest.json"), "utf8"),
+    );
+    const artifactPaths = manifest.artifacts
+      .map((artifact) => artifact.path)
+      .sort();
+
+    expect(contractNames).toEqual(componentNames);
+    expect(artifactPaths).toEqual(
+      componentNames.map((name) => `${name}.contract.json`),
+    );
+
+    for (const componentName of componentNames) {
+      const contract = JSON.parse(
+        readFileSync(
+          join(root, `contracts/${componentName}.contract.json`),
+          "utf8",
+        ),
+      );
+
+      expect(contract.contractId).toBe(componentName);
+      expect(validateComponent(contract)).toBe(true);
+    }
+
+    expect(validateManifest(manifest)).toBe(true);
+  });
+
+  it.each(Object.entries(contractCoverage))(
+    "%s preserves its enums, slots, and states",
+    (componentName, expected) => {
+      const contract = JSON.parse(
+        readFileSync(
+          join(root, `contracts/${componentName}.contract.json`),
+          "utf8",
+        ),
+      );
+      const properties = contract.props?.properties ?? {};
+      const actualEnums = Object.fromEntries(
+        Object.entries(properties)
+          .filter(
+            ([name, property]) =>
+              Object.hasOwn(expected.enums, name) && Array.isArray(property.enum),
+          )
+          .map(([name, property]) => [name, property.enum]),
+      );
+      const slotNames = (contract.slots ?? []).map((slot) =>
+        typeof slot === "string" ? slot : slot.name,
+      );
+
+      expect(actualEnums).toEqual(expected.enums);
+      expect(slotNames).toEqual(expected.slots);
+      expect(contract.states ?? []).toEqual(expected.states);
+    },
+  );
 });
