@@ -24,13 +24,13 @@ change if the added assertions demonstrate a contract defect. Regenerate
 
 The expected design-led coverage is:
 
-| Component | Enum axes                                                                                                                      | Slots                                                                                      | States                          |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------- |
-| `button`  | `variant`: default, destructive, outline, secondary, ghost, link; `size`: default, xs, sm, lg, icon, icon-xs, icon-sm, icon-lg | default                                                                                    | hover, focus, active, disabled  |
-| `input`   | `type`: text, password, email, number, tel, url, search                                                                        | none                                                                                       | hover, focus, disabled, invalid |
-| `badge`   | `variant`: default, secondary, destructive, outline, ghost, link                                                               | default                                                                                    | hover, focus, disabled          |
-| `label`   | none                                                                                                                           | default                                                                                    | disabled                        |
-| `card`    | `size`: default, sm                                                                                                            | default, card-header, card-title, card-description, card-content, card-footer, card-action | hover, focus                    |
+| Component | Enum axes                                                                                                                                                     | Slots                                                                                      | States                          |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------- |
+| `button`  | `variant`: default, destructive, outline, secondary, ghost, link; `size`: default, xs, sm, lg, icon, icon-xs, icon-sm, icon-lg; `type`: button, submit, reset | default                                                                                    | hover, focus, active, disabled  |
+| `input`   | `type`: text, password, email, number, tel, url, search                                                                                                       | none                                                                                       | hover, focus, disabled, invalid |
+| `badge`   | `variant`: default, secondary, destructive, outline, ghost, link                                                                                              | default                                                                                    | hover, focus, disabled          |
+| `label`   | none                                                                                                                                                          | default                                                                                    | disabled                        |
+| `card`    | `size`: default, sm                                                                                                                                           | default, card-header, card-title, card-description, card-content, card-footer, card-action | hover, focus                    |
 
 ## Validation
 
