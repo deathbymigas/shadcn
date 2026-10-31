@@ -59,10 +59,6 @@ After building, verify the generated CSS in:
 - `src/styles/tokens.css` (generated output)
 - Storybook: `pnpm storybook` → Design Tokens stories
 
-## Penpot Compatibility
-
-**UNVERIFIED** — Penpot export compatibility has not been tested. This directory structure and the DTCG contract are designed to be tool-neutral, but no Penpot export sample has been validated. Do not claim Penpot support without testing a representative export.
-
 ## Converting Non-DTCG Exports
 
 If your design tool exports a different format (Tokens Studio, Figma Variables, etc.), you must convert it to DTCG JSON before placing it here. The conversion logic belongs at the import boundary, not in the pipeline.

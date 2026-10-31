@@ -26,7 +26,7 @@ pnpm dev            # http://localhost:3000
 
 ## Token pipeline
 
-The token pipeline is **tool-neutral** and **design-tool-agnostic**:
+The token pipeline is design-tool-agnostic, for now at least:
 
 ```
 Design Tool (Figma, Penpot, etc.) → DTCG JSON Export → tokens/imports/ (direct mode)
@@ -42,7 +42,7 @@ Design Tool (Figma, Penpot, etc.) → DTCG JSON Export → tokens/imports/ (dire
 
 ### Source Modes
 
-The pipeline supports two explicit **project workflow policies**:
+The pipeline supports two explicit project workflow policies:
 
 - **Curated mode (default)** — Build from `tokens/tokens.json`, a reviewed, project-owned DTCG token source. The upstream design tool export remains separate.
 - **Direct mode** — Build directly from selected DTCG files in `tokens/imports/`. Use when you want to build straight from a design tool export (after DTCG conversion).
@@ -76,16 +76,6 @@ The pipeline supports two explicit **project workflow policies**:
 **Never edit generated files by hand:**
 
 - `src/styles/tokens.css` — Generated CSS variables (edit `tokens/tokens.json` or `tokens/imports/*.json` instead)
-
-### Design Tool Compatibility
-
-| Tool                            | Status         | Notes                                                               |
-| ------------------------------- | -------------- | ------------------------------------------------------------------- |
-| Figma (Tokens Studio export)    | **Tested**     | Used as compatibility sample; DTCG conversion required              |
-| Figma (native Variables export) | **Untested**   | Expected to work with DTCG conversion                               |
-| Penpot                          | **UNVERIFIED** | No export sample tested; DTCG contract is tool-neutral in principle |
-
-Do not claim compatibility without a tested representative export.
 
 ## Storybook
 
