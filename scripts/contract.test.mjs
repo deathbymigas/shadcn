@@ -237,6 +237,7 @@ const contractCoverage = {
     enums: {
       variant: ["default", "destructive", "outline", "secondary", "ghost", "link"],
       size: ["default", "xs", "sm", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"],
+      type: ["button", "submit", "reset"],
     },
     slots: ["default"],
     states: ["hover", "focus", "active", "disabled"],
@@ -317,10 +318,7 @@ describe("current component contract inventory", () => {
       const properties = contract.props?.properties ?? {};
       const actualEnums = Object.fromEntries(
         Object.entries(properties)
-          .filter(
-            ([name, property]) =>
-              Object.hasOwn(expected.enums, name) && Array.isArray(property.enum),
-          )
+          .filter(([, property]) => Array.isArray(property.enum))
           .map(([name, property]) => [name, property.enum]),
       );
       const slotNames = (contract.slots ?? []).map((slot) =>
