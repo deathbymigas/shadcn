@@ -15,25 +15,28 @@ capability.
 
 ## Scope
 
-The validation covers:
+The aggregate preserves the existing token, component-contract, and DSDS
+checks, then adds the requested checks:
 
 1. Token generation with `pnpm tokens:build`
-2. Type checking with `pnpm typecheck`
-3. Linting with `pnpm lint`
-4. Unit tests with `pnpm test`
-5. Storybook accessibility tests
-6. Playwright visual and end-to-end tests with `pnpm test:e2e`
+2. Component contract validation with `node scripts/validate-contracts.mjs`
+3. DSDS documentation lint with `node scripts/dsds-lint.mjs`
+4. Type checking with `pnpm typecheck`
+5. Linting with `pnpm lint`
+6. Unit tests with `pnpm test`
+7. Storybook accessibility tests
+8. Playwright visual and end-to-end tests with `pnpm test:e2e`
 
 The target project is `deathbymigas/shadcn`.
 
 ## Design
 
 Add a project script, `pnpm validate:design-system`, as the single source of
-validation logic. A small Node.js runner invokes the six existing or dedicated
-check commands with argument arrays, records a clear pass/fail summary for
-each, and continues after failures so one run reports all results. The overall
-script exits unsuccessfully if any check fails. It runs from the project root
-and does not rely on Swamp's separate nested workspace.
+validation logic. A small Node.js runner invokes the eight existing or
+dedicated check commands with argument arrays, records a clear pass/fail
+summary for each, and continues after failures so one run reports all results.
+The overall script exits unsuccessfully if any check fails. It runs from the
+project root and does not rely on Swamp's separate nested workspace.
 
 ### Accessibility
 
@@ -71,9 +74,10 @@ implementation.
 ## Validation of this design
 
 Implementation should verify the Storybook a11y test configuration, the
-runner's command list and failure aggregation, all six checks, and the complete
-aggregate command. Unit tests should confirm that all checks run after an
-individual failure and that the final exit code reflects every result.
+runner's command list and failure aggregation, all eight checks, and the
+complete aggregate command. Unit tests should confirm that all checks run
+after an individual failure and that the final exit code reflects every
+result.
 
 ## Compatibility with prior scope
 
