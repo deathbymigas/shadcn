@@ -1,0 +1,8 @@
+{
+  "mode": "curated",
+  "sources": {
+    "direct": ["tokens/fixtures/pilot.tokens.json"],
+    "curated": ["tokens/tokens.json"]
+  },
+  "output": "src/styles/tokens.css"
+}

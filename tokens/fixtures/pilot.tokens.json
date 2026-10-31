@@ -1,0 +1,43 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "color": {
+    "palette": {
+      "primary": {
+        "600": {
+          "$value": "#171717",
+          "$type": "color"
+        }
+      }
+    },
+    "light": {
+      "primary": {
+        "$value": "{color.palette.primary.600}",
+        "$type": "color"
+      },
+      "pipeline-proof": {
+        "$value": "#abcdef",
+        "$type": "color"
+      }
+    },
+    "dark": {
+      "primary": {
+        "$value": "#e5e5e5",
+        "$type": "color"
+      }
+    }
+  },
+  "dimension": {
+    "spacing": {
+      "1": {
+        "$value": "0.25rem",
+        "$type": "dimension"
+      }
+    },
+    "radius": {
+      "base": {
+        "$value": "0.625rem",
+        "$type": "dimension"
+      }
+    }
+  }
+}
