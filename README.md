@@ -1,6 +1,8 @@
 # designer-led design-to-code pipeline
 
-Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. Designer-led: Figma is the source of truth for tokens and components.
+Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. I set up this environment for various design automation experiments. It might turn into something useful. It might not.
+
+Anyway, here's a bunch of robot slop:
 
 ## Getting started
 
