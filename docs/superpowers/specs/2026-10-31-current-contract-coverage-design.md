@@ -15,7 +15,9 @@ data-driven coverage in `scripts/contract.test.mjs` to verify that each source
 component has a schema-valid contract and a corresponding manifest artifact.
 Add explicit expectations for each contract's meaningful enum values, slots,
 and states. The checks should validate the authored contract semantics rather
-than derive their expected values from the same contract data.
+than derive their expected values from the same contract data. Assert that the
+expectation matrix keys exactly match the discovered source inventory so a
+future component cannot silently lack semantic assertions.
 
 Do not add shadcn component implementations, alter component runtime behavior,
 or modify unrelated working-tree changes. Existing contract JSON should only
