@@ -24,6 +24,13 @@ Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. Designer-led: Figm
 - Dark mode via `.dark` class; both themes must be verified.
 - Storybook loads `src/styles/tokens.css` and compiles Tailwind utilities through `@tailwindcss/vite` in `.storybook/main.ts`. Import both token and global CSS in `.storybook/preview.tsx`; verify rendered light and dark stories, not just a successful build.
 
+## Component Contracts and DSDS
+
+- Before writing component code, read `contracts/<component>.contract.json` and `docs/components/<component>.dsds.yaml`. Check DSDS `traits` for valid values, `uses` for required token IDs, and `for: agent` guidance for component-specific instructions.
+- Contract `props.properties` defines props with JSON Schema; enum props define variant axes. Also follow the contract's `slots` and `states`.
+- In DSDS, `specs` points to the contract, `uses` lists token IDs defined by `docs/tokens/*.dsds.yaml`, `refs` links to Figma, Storybook, or the component source, and `for: agent` provides agent-specific guidance.
+- When adding a variant, update the contract enum, the TypeScript component, and the DSDS traits/combos. Then run `node scripts/validate-contracts.mjs`, `node scripts/generate-manifest.mjs`, and `node scripts/dsds-lint.mjs`.
+
 ## Token Pipeline
 
 The token pipeline is **tool-neutral** and uses **DTCG JSON** as the code-facing contract.
