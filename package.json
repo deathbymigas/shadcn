@@ -55,6 +55,7 @@
     "playwright": "latest",
     "prettier": "^3.9.10",
     "storybook": "^10.6.5",
+    "style-dictionary": "^5.7.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "latest",

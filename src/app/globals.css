@@ -47,6 +47,11 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --spacing-1: var(--token-spacing-1);
+  --spacing-2: var(--token-spacing-2);
+  --spacing-4: var(--token-spacing-4);
+  --spacing-6: var(--token-spacing-6);
+  --spacing-8: var(--token-spacing-8);
 }
 
 @layer base {
