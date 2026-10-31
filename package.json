@@ -14,7 +14,8 @@
     "tokens:build": "node scripts/build-tokens.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "chromatic": "npx chromatic --project-token=chpt_c2639a421464964"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -49,6 +50,7 @@
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "canonical-json": "^0.0.4",
+    "chromatic": "^18.13.6",
     "design-system-documentation-schema": "github:somerandomdude/design-system-documentation-schema",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
