@@ -1,13 +1,19 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { tmpdir } from "node:os";
+import { build as viteBuild } from "vite";
+import tailwindcss from "@tailwindcss/vite";
 import { loadPipelineConfig, resolveSources } from "./token-source.mjs";
 import { buildTokens } from "./build-tokens.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
+const tempDir = mkdtempSync(join(tmpdir(), "shadcn-token-pipeline-"));
+
+afterAll(() => rmSync(tempDir, { recursive: true, force: true }));
 
 describe("token source configuration", () => {
   it("selects the curated source by default", async () => {
@@ -37,7 +43,7 @@ describe("token output contract", () => {
     const result = await buildTokens({
       configPath: join(root, "tokens", "pipeline.config.json"),
       modeOverride: "curated",
-      outputPath: join(root, "src", "styles", "tokens.css"),
+      outputPath: join(tempDir, "project-contract.css"),
     });
     css = readFileSync(result.outputPath, "utf8");
   });
@@ -66,6 +72,30 @@ describe("token output contract", () => {
   });
 });
 
+describe("Tailwind spacing integration", () => {
+  it("makes p-1 use the generated spacing token", async () => {
+    const entryPath = join(tempDir, "tailwind-spacing-entry.css");
+    writeFileSync(
+      entryPath,
+      `@import "${join(root, "src", "app", "globals.css")}";\n@source inline("p-1");\n`,
+    );
+
+    const result = await viteBuild({
+      configFile: false,
+      root,
+      plugins: [tailwindcss()],
+      build: {
+        write: false,
+        rollupOptions: { input: entryPath },
+      },
+    });
+
+    const css = String(result.output.find((file) => file.type === "asset").source);
+
+    expect(css).toMatch(/\.p-1\s*\{\s*padding:\s*var\(--token-spacing-1\)\s*;?\s*\}/);
+  });
+});
+
 describe("alias resolution and units", () => {
   let css;
 
@@ -73,7 +103,7 @@ describe("alias resolution and units", () => {
     const result = await buildTokens({
       configPath: join(root, "tokens", "fixtures", "pilot.pipeline.config.json"),
       modeOverride: "direct",
-      outputPath: join(root, "tmp", "pilot-test.css"),
+      outputPath: join(tempDir, "pilot-test.css"),
     });
     css = readFileSync(result.outputPath, "utf8");
   });
@@ -108,13 +138,13 @@ describe("unresolved alias handling", () => {
         }
       }
     };
-    const tempPath = join(root, "tmp", "unresolved-alias.tokens.json");
+    const tempPath = join(tempDir, "unresolved-alias.tokens.json");
     const tempConfig = {
       mode: "curated",
       sources: { curated: [tempPath], direct: [] },
-      output: join(root, "tmp", "unresolved-output.css")
+      output: join(tempDir, "unresolved-output.css")
     };
-    const tempConfigPath = join(root, "tmp", "unresolved-config.json");
+    const tempConfigPath = join(tempDir, "unresolved-config.json");
     writeFileSync(tempPath, JSON.stringify(tempFixture, null, 2));
     writeFileSync(tempConfigPath, JSON.stringify(tempConfig, null, 2));
 
@@ -130,7 +160,7 @@ describe("unresolved alias handling", () => {
 
 describe("direct mode CLI", () => {
   it("builds from direct DTCG input and includes fixture-only marker", async () => {
-    const outputPath = join(root, "tmp", "shadcn-token-pilot.css");
+    const outputPath = join(tempDir, "shadcn-token-pilot.css");
     const result = spawnSync("node", [
       "scripts/build-tokens.mjs",
       "--config",
@@ -147,7 +177,7 @@ describe("direct mode CLI", () => {
   });
 
   it("does not include fixture-only marker in curated mode", async () => {
-    const outputPath = join(root, "tmp", "shadcn-token-curated.css");
+    const outputPath = join(tempDir, "shadcn-token-curated.css");
     const result = spawnSync("node", [
       "scripts/build-tokens.mjs",
       "--config",
@@ -175,9 +205,9 @@ describe("source token change isolation", () => {
     modifiedFixture.color.palette.primary["600"].$value = "#123456";
 
     // Write to temp location
-    const tempFixturePath = join(root, "tmp", "pilot-modified.tokens.json");
-    const tempConfigPath = join(root, "tmp", "pilot-modified-config.json");
-    const tempOutputPath = join(root, "tmp", "pilot-modified.css");
+    const tempFixturePath = join(tempDir, "pilot-modified.tokens.json");
+    const tempConfigPath = join(tempDir, "pilot-modified-config.json");
+    const tempOutputPath = join(tempDir, "pilot-modified.css");
 
     const tempConfig = {
       mode: "curated",
