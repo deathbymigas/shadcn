@@ -221,7 +221,7 @@ export const PilotTokens: Story = {
 export const PilotTokensDark: Story = {
   decorators: [
     (Story) => (
-      <div className="dark">
+      <div className="dark bg-background text-foreground">
         <Story />
       </div>
     ),
