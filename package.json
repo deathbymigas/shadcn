@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:a11y": "vitest run --config vitest.storybook.config.ts",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "tokens:build": "node scripts/build-tokens.mjs",
