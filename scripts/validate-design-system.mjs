@@ -2,6 +2,9 @@ import { spawn } from "node:child_process";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+// Keep only the most recent 64 Ki UTF-16 code units per stream; all output is streamed live.
+const MAX_CAPTURED_OUTPUT_LENGTH = 64 * 1024;
+
 export const VALIDATION_CHECKS = [
   { name: "tokens", command: "pnpm", args: ["tokens:build"] },
   {
@@ -17,10 +20,20 @@ export const VALIDATION_CHECKS = [
   { name: "e2e", command: "pnpm", args: ["test:e2e"] },
 ];
 
-function executeCommand(command, args, { cwd }) {
+function appendOutput(capture, chunk) {
+  const output = capture.value + chunk;
+  if (output.length > MAX_CAPTURED_OUTPUT_LENGTH) {
+    capture.value = output.slice(-MAX_CAPTURED_OUTPUT_LENGTH);
+    capture.truncated = true;
+  } else {
+    capture.value = output;
+  }
+}
+
+export function executeCommand(command, args, { cwd }) {
   return new Promise((resolveResult) => {
-    let stdout = "";
-    let stderr = "";
+    const stdout = { value: "", truncated: false };
+    const stderr = { value: "", truncated: false };
     let settled = false;
     const finish = (result) => {
       if (settled) return;
@@ -35,30 +48,35 @@ function executeCommand(command, args, { cwd }) {
 
     child.stdout.setEncoding("utf8");
     child.stdout.on("data", (chunk) => {
-      stdout += chunk;
+      appendOutput(stdout, chunk);
       process.stdout.write(chunk);
     });
 
     child.stderr.setEncoding("utf8");
     child.stderr.on("data", (chunk) => {
-      stderr += chunk;
+      appendOutput(stderr, chunk);
       process.stderr.write(chunk);
     });
 
     child.once("error", (error) => {
       finish({
         exitCode: 1,
-        stdout,
-        stderr,
+        stdout: stdout.value,
+        stderr: stderr.value,
+        stdoutTruncated: stdout.truncated,
+        stderrTruncated: stderr.truncated,
         error: error.message,
       });
     });
 
-    child.once("close", (code) => {
+    child.once("close", (code, signal) => {
       finish({
-        exitCode: code ?? 1,
-        stdout,
-        stderr,
+        exitCode: code,
+        signal,
+        stdout: stdout.value,
+        stderr: stderr.value,
+        stdoutTruncated: stdout.truncated,
+        stderrTruncated: stderr.truncated,
       });
     });
   });
@@ -91,13 +109,16 @@ export async function runValidation({
       args: check.args,
       status: execution.error
         ? "error"
-        : execution.exitCode === 0
+        : execution.exitCode === 0 && !execution.signal
           ? "passed"
           : "failed",
       exitCode: execution.exitCode,
+      signal: execution.signal ?? null,
       durationMs: Date.now() - startedAt,
       stdout: execution.stdout ?? "",
       stderr: execution.stderr ?? "",
+      stdoutTruncated: execution.stdoutTruncated ?? false,
+      stderrTruncated: execution.stderrTruncated ?? false,
       ...(execution.error ? { error: execution.error } : {}),
     });
   }
