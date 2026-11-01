@@ -1,0 +1,88 @@
+name: Design System Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "contracts/**"
+      - "docs/**"
+      - "tokens/**"
+      - "scripts/**"
+      - "src/**"
+      - "e2e/**"
+      - "public/**"
+      - ".storybook/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "tsconfig.json"
+      - "next.config.ts"
+      - "eslint.config.mjs"
+      - "vitest.config.ts"
+      - "vitest.setup.ts"
+      - "vitest.storybook.config.ts"
+      - "playwright.config.ts"
+      - "README.md"
+      - ".github/workflows/design-system-validation.yml"
+  pull_request:
+    paths:
+      - "contracts/**"
+      - "docs/**"
+      - "tokens/**"
+      - "scripts/**"
+      - "src/**"
+      - "e2e/**"
+      - "public/**"
+      - ".storybook/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "tsconfig.json"
+      - "next.config.ts"
+      - "eslint.config.mjs"
+      - "vitest.config.ts"
+      - "vitest.setup.ts"
+      - "vitest.storybook.config.ts"
+      - "playwright.config.ts"
+      - "README.md"
+      - ".github/workflows/design-system-validation.yml"
+
+jobs:
+  validate-design-system:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.28.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run design system validation
+        run: pnpm validate:design-system
+
+      - name: Upload validation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-system-validation
+          path: |
+            src/styles/tokens.css
+            contracts/manifest.json
+            playwright-report/
+            test-results/
+          retention-days: 7
