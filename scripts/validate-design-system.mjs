@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { constants as osConstants } from "node:os";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -30,15 +31,40 @@ function appendOutput(capture, chunk) {
   }
 }
 
-export function executeCommand(command, args, { cwd }) {
+export function executeCommand(
+  command,
+  args,
+  {
+    cwd,
+    stdout: stdoutDestination = process.stdout,
+    stderr: stderrDestination = process.stderr,
+    signalSource = process,
+  },
+) {
   return new Promise((resolveResult) => {
     const stdout = { value: "", truncated: false };
     const stderr = { value: "", truncated: false };
     let settled = false;
+    let receivedSignal = null;
+    let closeResult = null;
+    let stdoutEnded = false;
+    let stderrEnded = false;
     const finish = (result) => {
       if (settled) return;
       settled = true;
+      signalSource.removeListener("SIGINT", handleSignal);
+      signalSource.removeListener("SIGTERM", handleSignal);
       resolveResult(result);
+    };
+    const finishAfterStreams = () => {
+      if (!closeResult || !stdoutEnded || !stderrEnded) return;
+      finish({
+        ...closeResult,
+        stdout: stdout.value,
+        stderr: stderr.value,
+        stdoutTruncated: stdout.truncated,
+        stderrTruncated: stderr.truncated,
+      });
     };
 
     const child = spawn(command, args, {
@@ -46,16 +72,37 @@ export function executeCommand(command, args, { cwd }) {
       stdio: ["ignore", "pipe", "pipe"],
     });
 
+    const handleSignal = (signal) => {
+      receivedSignal = signal;
+      child.kill(signal);
+    };
+    signalSource.once("SIGINT", handleSignal);
+    signalSource.once("SIGTERM", handleSignal);
+
     child.stdout.setEncoding("utf8");
     child.stdout.on("data", (chunk) => {
       appendOutput(stdout, chunk);
-      process.stdout.write(chunk);
+      if (!stdoutDestination.write(chunk)) {
+        child.stdout.pause();
+        stdoutDestination.once("drain", () => child.stdout.resume());
+      }
+    });
+    child.stdout.once("end", () => {
+      stdoutEnded = true;
+      finishAfterStreams();
     });
 
     child.stderr.setEncoding("utf8");
     child.stderr.on("data", (chunk) => {
       appendOutput(stderr, chunk);
-      process.stderr.write(chunk);
+      if (!stderrDestination.write(chunk)) {
+        child.stderr.pause();
+        stderrDestination.once("drain", () => child.stderr.resume());
+      }
+    });
+    child.stderr.once("end", () => {
+      stderrEnded = true;
+      finishAfterStreams();
     });
 
     child.once("error", (error) => {
@@ -66,18 +113,18 @@ export function executeCommand(command, args, { cwd }) {
         stdoutTruncated: stdout.truncated,
         stderrTruncated: stderr.truncated,
         error: error.message,
+        signal: receivedSignal,
+        interrupted: receivedSignal !== null,
       });
     });
 
     child.once("close", (code, signal) => {
-      finish({
+      closeResult = {
         exitCode: code,
-        signal,
-        stdout: stdout.value,
-        stderr: stderr.value,
-        stdoutTruncated: stdout.truncated,
-        stderrTruncated: stderr.truncated,
-      });
+        signal: receivedSignal ?? signal,
+        interrupted: receivedSignal !== null,
+      };
+      finishAfterStreams();
     });
   });
 }
@@ -121,11 +168,19 @@ export async function runValidation({
       stderrTruncated: execution.stderrTruncated ?? false,
       ...(execution.error ? { error: execution.error } : {}),
     });
+
+    if (execution.interrupted) break;
   }
 
+  const signal = results.find((result) => result.signal)?.signal ?? null;
   return {
     results,
-    exitCode: results.every((result) => result.status === "passed") ? 0 : 1,
+    signal,
+    exitCode: signal
+      ? 128 + osConstants.signals[signal]
+      : results.every((result) => result.status === "passed")
+        ? 0
+        : 1,
   };
 }
 
@@ -145,6 +200,12 @@ if (
   const passed = result.results.filter(
     (check) => check.status === "passed",
   ).length;
-  console.log(`${passed}/${result.results.length} checks passed`);
+  const skipped = VALIDATION_CHECKS.length - result.results.length;
+  const summary = `${passed}/${VALIDATION_CHECKS.length} checks passed`;
+  console.log(
+    result.signal
+      ? `${summary} (interrupted by ${result.signal}; ${skipped} checks skipped)`
+      : summary,
+  );
   process.exitCode = result.exitCode;
 }

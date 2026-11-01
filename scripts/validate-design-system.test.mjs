@@ -1,3 +1,5 @@
+import { EventEmitter } from "node:events";
+import { Writable } from "node:stream";
 import { describe, expect, it, vi } from "vitest";
 import {
   executeCommand,
@@ -84,7 +86,24 @@ describe("runValidation", () => {
       exitCode: null,
       signal: "SIGTERM",
     });
-    expect(result.exitCode).toBe(1);
+    expect(result.exitCode).toBe(143);
+  });
+
+  it("stops after a parent signal and returns a signal-aware exit code", async () => {
+    const execute = vi.fn().mockResolvedValue({
+      exitCode: null,
+      signal: "SIGTERM",
+      interrupted: true,
+      stdout: "",
+      stderr: "",
+    });
+
+    const result = await runValidation({ cwd: "/project", execute });
+
+    expect(execute).toHaveBeenCalledTimes(1);
+    expect(result.results).toHaveLength(1);
+    expect(result.signal).toBe("SIGTERM");
+    expect(result.exitCode).toBe(143);
   });
 
   it("records command-start errors and still runs later checks", async () => {
@@ -139,5 +158,74 @@ describe("executeCommand", () => {
       stdoutWrite.mockRestore();
       stderrWrite.mockRestore();
     }
+  });
+
+  it("relays parent signals to the active child and removes signal listeners", async () => {
+    const signalSource = new EventEmitter();
+    const destination = new Writable({
+      write(_chunk, _encoding, callback) {
+        callback();
+      },
+    });
+    const execution = executeCommand(
+      process.execPath,
+      ["-e", "setInterval(() => {}, 1000)"],
+      {
+        cwd: process.cwd(),
+        stdout: destination,
+        stderr: destination,
+        signalSource,
+      },
+    );
+
+    setTimeout(() => signalSource.emit("SIGTERM"), 50);
+    const result = await execution;
+
+    expect(result).toMatchObject({
+      exitCode: null,
+      signal: "SIGTERM",
+      interrupted: true,
+    });
+    expect(signalSource.listenerCount("SIGINT")).toBe(0);
+    expect(signalSource.listenerCount("SIGTERM")).toBe(0);
+    destination.destroy();
+  });
+
+  it("pauses child output until the destination drains", async () => {
+    const output = "x".repeat(200_000);
+    let receivedLength = 0;
+    let drainCount = 0;
+    const destination = new Writable({
+      highWaterMark: 1,
+      write(chunk, _encoding, callback) {
+        receivedLength += chunk.length;
+        setTimeout(callback, 1);
+      },
+    });
+    destination.on("drain", () => drainCount++);
+
+    const result = await executeCommand(
+      process.execPath,
+      [
+        "-e",
+        `process.stdout.write(${JSON.stringify(output)}, () => process.exit(0))`,
+      ],
+      {
+        cwd: process.cwd(),
+        stdout: destination,
+        stderr: new Writable({
+          write(_chunk, _encoding, callback) {
+            callback();
+          },
+        }),
+      },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(receivedLength).toBe(output.length);
+    expect(drainCount).toBeGreaterThan(0);
+    expect(result.stdout).toHaveLength(64 * 1024);
+    expect(result.stdoutTruncated).toBe(true);
+    destination.destroy();
   });
 });
