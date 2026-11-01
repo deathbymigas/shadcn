@@ -14,17 +14,19 @@ pnpm dev            # http://localhost:3000
 
 ## Key commands
 
-| Command                | Purpose                             |
-| ---------------------- | ----------------------------------- |
-| `pnpm dev`             | Dev server (port 3000)              |
-| `pnpm build`           | Production build                    |
-| `pnpm typecheck`       | TypeScript check                    |
-| `pnpm lint`            | ESLint                              |
-| `pnpm test`            | Vitest unit tests                   |
-| `pnpm test:e2e`        | Playwright E2E + visual regression  |
-| `pnpm tokens:build`    | Generate CSS vars from token source |
-| `pnpm storybook`       | Component review (port 6006)        |
-| `pnpm build-storybook` | Build the static Storybook site     |
+| Command                       | Purpose                             |
+| ----------------------------- | ----------------------------------- |
+| `pnpm dev`                    | Dev server (port 3000)              |
+| `pnpm build`                  | Production build                    |
+| `pnpm typecheck`              | TypeScript check                    |
+| `pnpm lint`                   | ESLint                              |
+| `pnpm test`                   | Vitest unit tests                   |
+| `pnpm test:e2e`               | Playwright E2E + visual regression  |
+| `pnpm test:a11y`              | Storybook accessibility tests       |
+| `pnpm validate:design-system` | Full design-system validation       |
+| `pnpm tokens:build`           | Generate CSS vars from token source |
+| `pnpm storybook`              | Component review (port 6006)        |
+| `pnpm build-storybook`        | Build the static Storybook site     |
 
 ## Token pipeline
 
@@ -97,17 +99,24 @@ Update the prop's enum in the contract, then update the TypeScript component, ma
 
 ### Local validation
 
+Run the complete design-system gate from the repository root:
+
 ```bash
-pnpm test
-pnpm typecheck
-pnpm lint
-node scripts/generate-manifest.mjs
-node scripts/validate-contracts.mjs
-node scripts/dsds-lint.mjs
-pnpm build-storybook
+pnpm validate:design-system
 ```
 
-For interactive review, run `pnpm storybook`, then inspect the Design Tokens stories (colors, spacing, radius) and component stories in light and dark themes. Storybook imports the generated token stylesheet through `.storybook/preview.tsx`.
+This runs token generation, contract validation, DSDS lint, typecheck, lint,
+unit tests, Storybook accessibility tests, and Playwright visual/E2E tests.
+Install Chromium once before the browser checks with
+`pnpm exec playwright install chromium`.
+
+The following focused commands remain useful when updating generated or
+standalone artifacts:
+
+```bash
+node scripts/generate-manifest.mjs
+pnpm build-storybook
+```
 
 ### Troubleshooting
 
