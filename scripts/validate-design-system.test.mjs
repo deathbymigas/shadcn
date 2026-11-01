@@ -86,7 +86,10 @@ describe("runValidation", () => {
       exitCode: null,
       signal: "SIGTERM",
     });
-    expect(result.exitCode).toBe(143);
+    expect(execute).toHaveBeenCalledTimes(8);
+    expect(result.interrupted).toBe(false);
+    expect(result.signal).toBeNull();
+    expect(result.exitCode).toBe(1);
   });
 
   it("stops after a parent signal and returns a signal-aware exit code", async () => {
@@ -102,6 +105,7 @@ describe("runValidation", () => {
 
     expect(execute).toHaveBeenCalledTimes(1);
     expect(result.results).toHaveLength(1);
+    expect(result.interrupted).toBe(true);
     expect(result.signal).toBe("SIGTERM");
     expect(result.exitCode).toBe(143);
   });
@@ -169,7 +173,7 @@ describe("executeCommand", () => {
     });
     const execution = executeCommand(
       process.execPath,
-      ["-e", "setInterval(() => {}, 1000)"],
+      ["-e", "process.on('SIGTERM', () => {}); setInterval(() => {}, 1000)"],
       {
         cwd: process.cwd(),
         stdout: destination,
@@ -206,10 +210,7 @@ describe("executeCommand", () => {
 
     const result = await executeCommand(
       process.execPath,
-      [
-        "-e",
-        `process.stdout.write(${JSON.stringify(output)}, () => process.exit(0))`,
-      ],
+      ["-e", `process.stdout.end(${JSON.stringify(output)})`],
       {
         cwd: process.cwd(),
         stdout: destination,
@@ -221,6 +222,7 @@ describe("executeCommand", () => {
       },
     );
 
+    await new Promise((resolve) => destination.end(resolve));
     expect(result.exitCode).toBe(0);
     expect(receivedLength).toBe(output.length);
     expect(drainCount).toBeGreaterThan(0);
@@ -228,4 +230,39 @@ describe("executeCommand", () => {
     expect(result.stdoutTruncated).toBe(true);
     destination.destroy();
   });
+
+  it.each([
+    ["error", (destination) => destination.destroy(new Error("sink broke"))],
+    ["close", (destination) => destination.destroy()],
+  ])(
+    "settles and terminates the child when the output destination %s",
+    async (_event, closeDestination) => {
+      const destination = new Writable({
+        write(_chunk, _encoding, callback) {
+          callback();
+        },
+      });
+      const resultPromise = executeCommand(
+        process.execPath,
+        ["-e", "setInterval(() => process.stdout.write('output'), 1)"],
+        {
+          cwd: process.cwd(),
+          stdout: destination,
+          stderr: new Writable({
+            write(_chunk, _encoding, callback) {
+              callback();
+            },
+          }),
+        },
+      );
+
+      setTimeout(() => closeDestination(destination), 50);
+      const result = await resultPromise;
+
+      expect(result.exitCode).toBe(1);
+      expect(result.error).toContain("Output destination failed");
+      expect(result.interrupted).toBe(false);
+      expect(destination.listenerCount("drain")).toBe(0);
+    },
+  );
 });

@@ -46,14 +46,20 @@ export function executeCommand(
     const stderr = { value: "", truncated: false };
     let settled = false;
     let receivedSignal = null;
+    let outputError = null;
     let closeResult = null;
     let stdoutEnded = false;
     let stderrEnded = false;
+    const listeners = [];
+    let killTimer;
+    const listen = (emitter, event, handler, once = false) => {
+      emitter[once ? "once" : "on"](event, handler);
+      listeners.push(() => emitter.removeListener(event, handler));
+    };
     const finish = (result) => {
       if (settled) return;
       settled = true;
-      signalSource.removeListener("SIGINT", handleSignal);
-      signalSource.removeListener("SIGTERM", handleSignal);
+      for (const removeListener of listeners) removeListener();
       resolveResult(result);
     };
     const finishAfterStreams = () => {
@@ -72,19 +78,47 @@ export function executeCommand(
       stdio: ["ignore", "pipe", "pipe"],
     });
 
+    const failOutput = (error) => {
+      if (settled) return;
+      outputError = error;
+      child.kill("SIGTERM");
+      child.stdout.destroy();
+      child.stderr.destroy();
+      killTimer = setTimeout(() => child.kill("SIGKILL"), 500);
+      killTimer.unref();
+      finish({
+        exitCode: 1,
+        signal: null,
+        interrupted: false,
+        stdout: stdout.value,
+        stderr: stderr.value,
+        stdoutTruncated: stdout.truncated,
+        stderrTruncated: stderr.truncated,
+        error: `Output destination failed: ${error.message}`,
+      });
+    };
     const handleSignal = (signal) => {
       receivedSignal = signal;
       child.kill(signal);
+      if (killTimer) clearTimeout(killTimer);
+      killTimer = setTimeout(() => child.kill("SIGKILL"), 500);
+      killTimer.unref();
     };
-    signalSource.once("SIGINT", handleSignal);
-    signalSource.once("SIGTERM", handleSignal);
+    listen(signalSource, "SIGINT", () => handleSignal("SIGINT"), true);
+    listen(signalSource, "SIGTERM", () => handleSignal("SIGTERM"), true);
 
     child.stdout.setEncoding("utf8");
     child.stdout.on("data", (chunk) => {
+      if (settled || outputError) return;
       appendOutput(stdout, chunk);
-      if (!stdoutDestination.write(chunk)) {
-        child.stdout.pause();
-        stdoutDestination.once("drain", () => child.stdout.resume());
+      try {
+        if (!stdoutDestination.write(chunk)) {
+          child.stdout.pause();
+          const resume = () => child.stdout.resume();
+          listen(stdoutDestination, "drain", resume, true);
+        }
+      } catch (error) {
+        failOutput(error);
       }
     });
     child.stdout.once("end", () => {
@@ -94,10 +128,16 @@ export function executeCommand(
 
     child.stderr.setEncoding("utf8");
     child.stderr.on("data", (chunk) => {
+      if (settled || outputError) return;
       appendOutput(stderr, chunk);
-      if (!stderrDestination.write(chunk)) {
-        child.stderr.pause();
-        stderrDestination.once("drain", () => child.stderr.resume());
+      try {
+        if (!stderrDestination.write(chunk)) {
+          child.stderr.pause();
+          const resume = () => child.stderr.resume();
+          listen(stderrDestination, "drain", resume, true);
+        }
+      } catch (error) {
+        failOutput(error);
       }
     });
     child.stderr.once("end", () => {
@@ -105,7 +145,23 @@ export function executeCommand(
       finishAfterStreams();
     });
 
+    const watchDestination = (destination) => {
+      const handleError = (error) => failOutput(error);
+      const handleClose = () => {
+        if (!destination.writableFinished) {
+          failOutput(new Error("destination closed before output completed"));
+        }
+      };
+      listen(destination, "error", handleError);
+      listen(destination, "close", handleClose);
+    };
+    watchDestination(stdoutDestination);
+    if (stderrDestination !== stdoutDestination) {
+      watchDestination(stderrDestination);
+    }
+
     child.once("error", (error) => {
+      if (killTimer) clearTimeout(killTimer);
       finish({
         exitCode: 1,
         stdout: stdout.value,
@@ -119,6 +175,7 @@ export function executeCommand(
     });
 
     child.once("close", (code, signal) => {
+      if (killTimer) clearTimeout(killTimer);
       closeResult = {
         exitCode: code,
         signal: receivedSignal ?? signal,
@@ -166,17 +223,20 @@ export async function runValidation({
       stderr: execution.stderr ?? "",
       stdoutTruncated: execution.stdoutTruncated ?? false,
       stderrTruncated: execution.stderrTruncated ?? false,
+      interrupted: execution.interrupted ?? false,
       ...(execution.error ? { error: execution.error } : {}),
     });
 
     if (execution.interrupted) break;
   }
 
-  const signal = results.find((result) => result.signal)?.signal ?? null;
+  const interruptedResult = results.find((result) => result.interrupted);
+  const signal = interruptedResult?.signal ?? null;
   return {
     results,
+    interrupted: Boolean(interruptedResult),
     signal,
-    exitCode: signal
+    exitCode: interruptedResult
       ? 128 + osConstants.signals[signal]
       : results.every((result) => result.status === "passed")
         ? 0
