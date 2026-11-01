@@ -12,6 +12,7 @@
     "test:a11y": "vitest run --config vitest.storybook.config.ts",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "validate:design-system": "node scripts/validate-design-system.mjs",
     "tokens:build": "node scripts/build-tokens.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
