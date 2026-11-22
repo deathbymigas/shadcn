@@ -11,6 +11,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm build
       - run: pnpm lint
       - run: pnpm tsc --noEmit
       - run: node scripts/validate-contracts.mjs

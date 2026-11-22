@@ -14,6 +14,7 @@ export const VALIDATION_CHECKS = [
     args: ["scripts/validate-contracts.mjs"],
   },
   { name: "dsds", command: "node", args: ["scripts/dsds-lint.mjs"] },
+  { name: "build", command: "pnpm", args: ["build"] },
   { name: "typecheck", command: "pnpm", args: ["typecheck"] },
   { name: "lint", command: "pnpm", args: ["lint"] },
   { name: "unit", command: "pnpm", args: ["test"] },
